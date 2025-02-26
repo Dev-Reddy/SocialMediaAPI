@@ -17,6 +17,11 @@ import loggerMiddleware from "./src/middlewares/logger.middleware.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Read swagger definition
+const swaggerDocument = JSON.parse(
+  readFileSync(join(__dirname, "swagger.json"), "utf8")
+);
+
 const app = express();
 
 // middleware to parse the request body
@@ -46,16 +51,12 @@ app.use("/api/otp", otpRouter);
 // // serve the API documentation
 // app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 
-// Read the swagger.json file
-const swaggerFile = JSON.parse(
-  fs.readFileSync(join(__dirname, "swagger.json"), "utf8")
-);
-
-// Then use it in your app
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
+// Swagger setup
+app.use("/api-docs", swaggerUi.serve);
+app.get("/api-docs", swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Post Away API");
+  res.redirect("/api-docs");
 });
 
 // Middleware to handle 404 error

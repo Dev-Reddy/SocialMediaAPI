@@ -12,6 +12,22 @@
       "dest": "server.js"
     },
     {
+      "src": "/swagger-ui.css",
+      "dest": "server.js"
+    },
+    {
+      "src": "/swagger-ui-bundle.js",
+      "dest": "server.js"
+    },
+    {
+      "src": "/swagger-ui-standalone-preset.js",
+      "dest": "server.js"
+    },
+    {
+      "src": "/swagger-ui-init.js",
+      "dest": "server.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "server.js"
     },

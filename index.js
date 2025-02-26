@@ -19,7 +19,7 @@ const __dirname = dirname(__filename);
 
 // Read swagger definition
 const swaggerDocument = JSON.parse(
-  readFileSync(join(__dirname, "swagger.json"), "utf8")
+  fs.readFileSync(join(__dirname, "swagger.json"), "utf8")
 );
 
 const app = express();

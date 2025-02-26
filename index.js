@@ -1,4 +1,5 @@
 import express from "express";
+import swagger from "swagger-ui-express";
 import userRouter from "./src/features/user/router/user.routes.js";
 import postRouter from "./src/features/post/router/post.routes.js";
 import commentRouter from "./src/features/comment/router/comment.routes.js";
@@ -8,12 +9,9 @@ import friendsRouter from "./src/features/friends/router/friends.routes.js";
 import otpRouter from "./src/features/otp/router/otp.routes.js";
 import { ApplicationError } from "./src/error/applicationError.js";
 import loggerMiddleware from "./src/middlewares/logger.middleware.js";
-import swaggerRouter from "./swagger-html.js";
-import cors from "cors";
+import apiDocs from "./swagger.json" with {type: "json"};
 
 const app = express();
-// Enable CORS for all routes
-app.use(cors());
 
 // middleware to parse the request body
 app.use(express.json());
@@ -39,14 +37,11 @@ app.use("/api/friends", jwtAuth, friendsRouter);
 // OTP routes
 app.use("/api/otp", otpRouter);
 
-// // serve the API documentation
-// app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
-
-// Swagger setup
-// Serve the API documentation
-app.use("/api-docs", swaggerRouter);
+// serve the API documentation
+app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 
 app.get("/", (req, res) => {
+  // res.send("Welcome to the Post Away API");
   res.redirect("/api-docs");
 });
 

@@ -8,7 +8,7 @@
   "servers": [
     {
       "url": "https://social-media-api-blush.vercel.app",
-      "description": "Local server"
+      "description": "Production server"
     }
   ],
   "paths": {

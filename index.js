@@ -9,8 +9,11 @@ import otpRouter from "./src/features/otp/router/otp.routes.js";
 import { ApplicationError } from "./src/error/applicationError.js";
 import loggerMiddleware from "./src/middlewares/logger.middleware.js";
 import swaggerRouter from "./swagger-html.js";
+import cors from "cors";
 
 const app = express();
+// Enable CORS for all routes
+app.use(cors());
 
 // middleware to parse the request body
 app.use(express.json());

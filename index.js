@@ -1,8 +1,4 @@
 import express from "express";
-import swaggerUi from "swagger-ui-express";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
 import userRouter from "./src/features/user/router/user.routes.js";
 import postRouter from "./src/features/post/router/post.routes.js";
 import commentRouter from "./src/features/comment/router/comment.routes.js";
@@ -12,15 +8,7 @@ import friendsRouter from "./src/features/friends/router/friends.routes.js";
 import otpRouter from "./src/features/otp/router/otp.routes.js";
 import { ApplicationError } from "./src/error/applicationError.js";
 import loggerMiddleware from "./src/middlewares/logger.middleware.js";
-// import apiDocs from "./swagger.json" with {type: "json"};
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-// Read swagger definition
-const swaggerDocument = JSON.parse(
-  fs.readFileSync(join(__dirname, "swagger.json"), "utf8")
-);
+import swaggerRouter from "./swagger-ui.js";
 
 const app = express();
 
@@ -52,8 +40,8 @@ app.use("/api/otp", otpRouter);
 // app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
 
 // Swagger setup
-app.use("/api-docs", swaggerUi.serve);
-app.get("/api-docs", swaggerUi.setup(swaggerDocument));
+// Serve the API documentation
+app.use("/api-docs", swaggerRouter);
 
 app.get("/", (req, res) => {
   res.redirect("/api-docs");

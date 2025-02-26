@@ -1,5 +1,8 @@
 import express from "express";
-import swagger from "swagger-ui-express";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 import userRouter from "./src/features/user/router/user.routes.js";
 import postRouter from "./src/features/post/router/post.routes.js";
 import commentRouter from "./src/features/comment/router/comment.routes.js";
@@ -9,7 +12,10 @@ import friendsRouter from "./src/features/friends/router/friends.routes.js";
 import otpRouter from "./src/features/otp/router/otp.routes.js";
 import { ApplicationError } from "./src/error/applicationError.js";
 import loggerMiddleware from "./src/middlewares/logger.middleware.js";
-import apiDocs from "./swagger.json" with {type: "json"};
+// import apiDocs from "./swagger.json" with {type: "json"};
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 
@@ -37,8 +43,16 @@ app.use("/api/friends", jwtAuth, friendsRouter);
 // OTP routes
 app.use("/api/otp", otpRouter);
 
-// serve the API documentation
-app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
+// // serve the API documentation
+// app.use("/api-docs", swagger.serve, swagger.setup(apiDocs));
+
+// Read the swagger.json file
+const swaggerFile = JSON.parse(
+  fs.readFileSync(join(__dirname, "swagger.json"), "utf8")
+);
+
+// Then use it in your app
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.get("/", (req, res) => {
   res.send("Welcome to the Post Away API");

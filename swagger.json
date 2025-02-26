@@ -3,7 +3,13 @@
   "info": {
     "title": "Social-Media API",
     "version": "1.0.0",
-    "description": "API documentation for the Social Media project.\n\nEnvironment Variables:\n- PORT = 3000\n- DB_URL = [Your Database URL]\n- JWT_SECRET = [Your JWT Secret]\n- MAILER_SERVICE = [Your Mailer Service]\n- MAILER_USER = [Your Mailer User]\n- MAILER_PASSWORD = [Your Mailer Password]"
+    "links": [
+      {
+        "name": "GitHub",
+        "url": "https://github.com/Dev-Reddy/SocialMediaAPI"
+      }
+    ],
+    "description": "API documentation for the Social Media project.\nUse these environment variables if you are setting up the project on your local repo by using the github repo (https://github.com/Dev-Reddy/SocialMediaAPI).\n\nEnvironment Variables:\n- PORT = 3000\n- DB_URL = [Your Database URL]\n- JWT_SECRET = [Your JWT Secret]\n- MAILER_SERVICE = [Your Mailer Service]\n- MAILER_USER = [Your Mailer User]\n- MAILER_PASSWORD = [Your Mailer Password]"
   },
   "servers": [
     {

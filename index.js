@@ -8,7 +8,7 @@ import friendsRouter from "./src/features/friends/router/friends.routes.js";
 import otpRouter from "./src/features/otp/router/otp.routes.js";
 import { ApplicationError } from "./src/error/applicationError.js";
 import loggerMiddleware from "./src/middlewares/logger.middleware.js";
-import swaggerRouter from "./swagger-ui.js";
+import swaggerRouter from "./swagger-html.js";
 
 const app = express();
 

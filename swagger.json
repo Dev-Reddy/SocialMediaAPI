@@ -1,0 +1,778 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Social-Media API",
+    "version": "1.0.0",
+    "description": "API documentation for the Social Media project.\n\nEnvironment Variables:\n- PORT = 3000\n- DB_URL = [Your Database URL]\n- JWT_SECRET = [Your JWT Secret]\n- MAILER_SERVICE = [Your Mailer Service]\n- MAILER_USER = [Your Mailer User]\n- MAILER_PASSWORD = [Your Mailer Password]"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/api/users/signup": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "required": true },
+                  "email": { "type": "string", "required": true },
+                  "password": { "type": "string", "required": true },
+                  "birthDate": {
+                    "type": "string",
+                    "format": "date",
+                    "required": true
+                  },
+                  "bio": {
+                    "type": "string"
+                  },
+                  "profilePicture": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": ["F", "M", "O", "NS"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/api/users/signin": {
+      "post": {
+        "summary": "User login",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string", "required": true },
+                  "password": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Login successful" },
+          "401": { "description": "Invalid credentials" }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "summary": "Logout current device",
+        "tags": ["Authentication"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "responses": {
+          "200": { "description": "Logged out successfully" }
+        }
+      }
+    },
+    "/api/users/logout-all-devices": {
+      "post": {
+        "summary": "Logout all devices",
+        "tags": ["Authentication"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "responses": {
+          "200": { "description": "All sessions terminated" }
+        }
+      }
+    },
+    "/api/users/get-details/{userId}": {
+      "get": {
+        "summary": "Get user details",
+        "tags": ["User Profile"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details (sensitive data excluded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/get-all-details": {
+      "get": {
+        "summary": "Get all users",
+        "tags": ["User Profile"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users (sensitive data excluded)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/update-details": {
+      "put": {
+        "summary": "Update user details",
+        "tags": ["User Profile"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "bio": {
+                    "type": "string"
+                  },
+                  "profilePicture": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Details updated successfully" },
+          "403": { "description": "Unauthorized update" }
+        }
+      }
+    },
+    "/api/posts/all": {
+      "get": {
+        "summary": "Get all posts",
+        "tags": ["Posts"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of all posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{postId}": {
+      "get": {
+        "summary": "Get specific post",
+        "tags": ["Posts"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete post",
+        "tags": ["Posts"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Post deleted successfully" }
+        }
+      },
+      "put": {
+        "summary": "Update post",
+        "tags": ["Posts"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "caption": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Post updated successfully" }
+        }
+      }
+    },
+    "/api/posts": {
+      "post": {
+        "summary": "Create new post",
+        "tags": ["Posts"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "caption": { "type": "string", "required": true },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Post created successfully" }
+        }
+      }
+    },
+    "/api/comments/{postId}": {
+      "get": {
+        "summary": "Get post comments",
+        "tags": ["Comments"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Comment" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add comment",
+        "tags": ["Comments"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Comment added" }
+        }
+      }
+    },
+    "/api/comments/{commentId}": {
+      "delete": {
+        "summary": "Delete comment",
+        "tags": ["Comments"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Comment deleted" }
+        }
+      },
+      "put": {
+        "summary": "Update comment",
+        "tags": ["Comments"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "comment": { "type": "string", "required": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment updated" }
+        }
+      }
+    },
+    "/api/likes/{id}": {
+      "post": {
+        "summary": "Get likes",
+        "tags": ["Likes"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "description": "The type can be either 'Post' or 'Comment'",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["Post", "Comment"],
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Like count and details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Like" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/likes/toggle/{id}": {
+      "post": {
+        "summary": "Toggle like",
+        "tags": ["Likes"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "description": "The type can be either 'Post' or 'Comment'",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["Post", "Comment"],
+                    "required": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Like status updated" }
+        }
+      }
+    },
+    "/api/friends/get-friends/{userId}": {
+      "get": {
+        "summary": "Get user's friends",
+        "tags": ["Friendships"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of friends",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Friendship" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/friends/get-pending-requests": {
+      "get": {
+        "summary": "Get pending friend requests",
+        "tags": ["Friendships"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of pending requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Friendship" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/friends/toggle-friendship/{friendId}": {
+      "post": {
+        "summary": "Toggle friendship status",
+        "tags": ["Friendships"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Friendship status updated" }
+        }
+      }
+    },
+    "/api/friends/response-to-request/{friendId}": {
+      "post": {
+        "summary": "Respond to friend request",
+        "tags": ["Friendships"],
+        "security": [
+          {
+            "JWT": {}
+          }
+        ],
+        "parameters": [
+          {
+            "name": "friendId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": ["accept", "reject"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Request processed" }
+        }
+      }
+    },
+    "/api/otp/send": {
+      "post": {
+        "summary": "Send OTP",
+        "tags": ["OTP"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP sent successfully" }
+        }
+      }
+    },
+    "/api/otp/verify": {
+      "post": {
+        "summary": "Verify OTP",
+        "tags": ["OTP"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "otp": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP verified" }
+        }
+      }
+    },
+    "/api/otp/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "tags": ["OTP"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Password reset successful" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "JWT": {
+        "in": "header",
+        "name": "Authorization",
+        "type": "apiKey"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "content": { "type": "string" },
+          "userId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "content": { "type": "string" },
+          "postId": { "type": "string" },
+          "userId": { "type": "string" }
+        }
+      },
+      "Like": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "targetId": { "type": "string" },
+          "userId": { "type": "string" }
+        }
+      },
+      "Friendship": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "userId": { "type": "string" },
+          "friendId": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    }
+  }
+}
